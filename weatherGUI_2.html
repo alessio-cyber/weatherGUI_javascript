@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+        .weather-container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        input {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+            border-radius: 25px;
+            border: none;
+            outline: none;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            color: white;
+            background: #ff6f61;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #d3544c;
+        }
+        .weather-info {
+            margin-top: 20px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="weather-container">
+    <h2><i class="fas fa-cloud-sun"></i> Weather App</h2>
+    <input type="text" id="city-input" placeholder="Enter a city">
+    <button onclick="getWeather()">Get Weather</button>
+    
+    <div id="weather-info" class="weather-info"></div>
+</div>
+
+<script>
+    const API_Key = '49caeaac0d4361852b9d6b163ebaf106'; //inserire la propria apikey
+
+    async function getWeather() {
+        const city = document.getElementById('city-input').value;
+        const baseUrl = `https://api.openweathermap.org/data/2.5/weather?APPID=${API_Key}&q=${city}&units=metric`;
+
+        try {
+            const response = await fetch(baseUrl);
+            const data = await response.json();
+
+            if (data.cod !== 200) {
+                throw new Error(data.message);
+            }
+
+            const iconCode = data.weather[0].icon;
+            const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+            const citta = data.name;
+            const paese = data.sys.country;
+            const coord = `Lat: ${data.coord.lat}, Lon: ${data.coord.lon}, Alt: ${data.main.grnd_level || 'N/A'}m s.l.m.`;
+            const solare = `Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}, Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}`;
+            const visibilita = data.visibility || 'N/A';
+            const cielo = data.weather[0].description;
+            const vento = `Direction: ${data.wind.deg || 'N/A'}°, Velocity: ${data.wind.speed || 'N/A'} m/s`;
+            const temperatura = `Current: ${data.main.temp}°C, Min: ${data.main.temp_min}°C, Max: ${data.main.temp_max}°C, Humidity: ${data.main.humidity}%`;
+
+            document.getElementById('weather-info').innerHTML = `
+                <div style="text-align: center;">
+                    <img src="${iconUrl}" alt="Weather Icon">
+                    <h3>${citta}, ${paese}</h3>
+                </div>
+                <p><strong>Coordinates:</strong> ${coord}</p>
+                <p><strong>Weather:</strong> ${cielo}</p>
+                <p><strong>Solar info:</strong> ${solare}</p>
+                <p><strong>Visibility:</strong> ${visibilita} m</p>
+                <p><strong>Temperature info:</strong> ${temperatura}</p>
+                <p><strong>Wind status:</strong> ${vento}</p>
+            `;
+        } catch (error) {
+            document.getElementById('weather-info').innerHTML = `<strong>Error:</strong> ${error.message}`;
+        }
+    }
+</script>
+
+</body>
+</html>
